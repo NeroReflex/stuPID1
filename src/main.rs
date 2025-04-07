@@ -1,21 +1,20 @@
 extern crate libc;
 
-use std::process::exit;
-use std::ptr;
-
 fn main() {
+    let program = b"/usr/bin/init\0".as_ptr() as *const libc::c_char;
+
     unsafe {
         // Check if the current process is PID 1
         if libc::getpid() != 1 {
-            exit(1);
+            libc::exit(1);
         }
 
         // Create a signal set and fill it
-        let mut set: libc::sigset_t = std::mem::zeroed();
+        let mut set: libc::sigset_t = core::mem::zeroed();
         libc::sigfillset(&mut set);
 
         // Block all signals
-        libc::sigprocmask(libc::SIG_BLOCK, &set, ptr::null_mut());
+        libc::sigprocmask(libc::SIG_BLOCK, &set, 0 as *mut libc::sigset_t);
 
         // Fork the process
         if libc::fork() != 0 {
@@ -27,7 +26,7 @@ fn main() {
         }
 
         // Unblock all signals
-        libc::sigprocmask(libc::SIG_UNBLOCK, &set, ptr::null_mut());
+        libc::sigprocmask(libc::SIG_UNBLOCK, &set, 0 as *mut libc::sigset_t);
 
         // Create a new session and set the process group ID
         // This drops kernel privileges
@@ -36,15 +35,15 @@ fn main() {
 
         // Execute a (supposedly init system) stored in /bin/init:
         // this replaces the current process with the specified one
-        let args = [b"init\0".as_ptr() as *const i8, ptr::null()];
-        let envs = [ptr::null()];
+        let args = [program, 0 as *mut libc::c_char];
+        let envs = [0 as *mut libc::c_char];
         libc::execve(
-            b"/bin/init\0".as_ptr() as *const i8,
+            program,
             args.as_ptr(),
-            envs.as_ptr(),
+            envs.as_ptr() as *const *const libc::c_char,
         );
 
         // If execve fails, exit with an error
-        exit(1);
+        libc::exit(1);
     }
 }
