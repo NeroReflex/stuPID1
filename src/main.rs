@@ -1,20 +1,20 @@
+#![no_main]
+
 extern crate libc;
 
-#[cfg(feature = "debug")]
-fn debug_print(message: &str) {
-    unsafe {
-        libc::printf(b"%s\0".as_ptr() as *const libc::c_char, message.as_ptr() as *const libc::c_char);
-    }
-}
-
+#[no_mangle]
 fn main() {
     let program = b"/usr/bin/init\0".as_ptr() as *const libc::c_char;
 
+    #[cfg(feature = "debug")]
+    libc::printf(b"Started stuPID1...\n\0".as_ptr() as *const libc::c_char);
+
     unsafe {
         // Check if the current process is PID 1
-        if libc::getpid() != 1 {
+        let pid = libc::getpid();
+        if pid != 1 {
             #[cfg(feature = "debug")]
-            debug_print("Not PID 1, exiting.\n");
+            libc::printf(b"Current process is not PID1: %d -- exiting.\n\0".as_ptr() as *const libc::c_char, pid);
 
             libc::exit(1);
         }
@@ -55,7 +55,7 @@ fn main() {
 
         if execve_res != 0 {
             #[cfg(feature = "debug")]
-            debug_print("execve failed, exiting.\n");
+            libc::printf(b"execve failed with %d -- exiting.\n\0".as_ptr() as *const libc::c_char, execve_res);
         } else {
             unreachable!()
         }
