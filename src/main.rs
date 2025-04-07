@@ -55,7 +55,7 @@ fn main() {
 
         if execve_res != 0 {
             #[cfg(feature = "debug")]
-            libc::printf(b"execve failed with %d -- exiting.\n\0".as_ptr() as *const libc::c_char, execve_res);
+            libc::printf(b"execve failed with %d -- exiting.\n\0".as_ptr() as *const libc::c_char, *libc::__errno_location());
         } else {
             unreachable!()
         }
