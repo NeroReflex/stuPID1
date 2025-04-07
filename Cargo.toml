@@ -1,8 +1,20 @@
 [package]
 name = "stupid1"
+authors = ["Denis Benato <benato.denis96@gmail.com>"]
 version = "0.1.1"
 edition = "2021"
 license = "MIT"
 
 [dependencies]
 libc = { version = "^0.2", features = [] }
+
+[package.metadata.deb]
+license-file = ["LICENSE.md", "4"]
+extended-description = """\
+The simplest possible init program that kills zombie processes and starts /usr/bin/init as PID1."""
+depends = "$auto"
+section = "utility"
+priority = "optional"
+assets = [
+    ["target/release/stupid1", "usr/bin/", "755"],
+]
