@@ -6,10 +6,10 @@ extern crate libc;
 fn main() {
     let program = b"/usr/bin/init\0".as_ptr() as *const libc::c_char;
 
-    #[cfg(feature = "debug")]
-    libc::printf(b"Started stuPID1...\n\0".as_ptr() as *const libc::c_char);
-
     unsafe {
+        #[cfg(feature = "debug")]
+        libc::printf(b"Started stuPID1...\n\0".as_ptr() as *const libc::c_char);
+
         // Check if the current process is PID 1
         let pid = libc::getpid();
         if pid != 1 {
