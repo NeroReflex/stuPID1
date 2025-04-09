@@ -8,6 +8,11 @@ license = "MIT"
 [features]
 debug = []
 
+[profile.release]
+strip = "debuginfo"
+lto = "thin"
+panic = "abort"
+
 [dependencies]
 libc = { version = "^0.2", features = [] }
 
